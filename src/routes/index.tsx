@@ -4,60 +4,115 @@ import { useEffect, useRef, useState } from "react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Work With Us — N21 West" },
+      { title: "Our Process — N21 West" },
       {
         name: "description",
         content:
-          "Partner with N21 West to enter the European market with intention, clarity, and long-term commitment.",
+          "A seven-step journey from discovery to long-term growth — bringing your brand into the European market with intention and clarity.",
       },
-      { property: "og:title", content: "Work With Us — N21 West" },
+      { property: "og:title", content: "Our Process — N21 West" },
       {
         property: "og:description",
         content:
-          "Partner with N21 West to enter the European market with intention, clarity, and long-term commitment.",
+          "A seven-step journey from discovery to long-term growth — bringing your brand into the European market with intention and clarity.",
       },
     ],
   }),
   component: Index,
 });
 
+const STEPS = [
+  {
+    n: "01",
+    title: "Discovery",
+    body: "Understanding your brand, products and aspirations.",
+  },
+  {
+    n: "02",
+    title: "Curation",
+    body: "Assessing suitability for the Dutch market.",
+  },
+  {
+    n: "03",
+    title: "Positioning",
+    body: "Refining pricing, presentation and storytelling.",
+  },
+  {
+    n: "04",
+    title: "Retail Presence",
+    body: "Introducing your brand into retail presence.",
+  },
+  {
+    n: "05",
+    title: "Activation",
+    body: "Connecting your brand with customers through engagement and exposure.",
+  },
+  {
+    n: "06",
+    title: "Insights",
+    body: "Gathering feedback, sales performance and market response.",
+  },
+  {
+    n: "07",
+    title: "Growth",
+    body: "Exploring future opportunities and long-term collaboration.",
+  },
+];
+
 function Index() {
   return (
     <main className="min-h-screen bg-noir-deep text-white antialiased">
-      <WorkWithUs />
+      <OurProcess />
     </main>
   );
 }
 
-function WorkWithUs() {
+function OurProcess() {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
+  const railRef = useRef<HTMLDivElement | null>(null);
+  const [mouse, setMouse] = useState({ x: 0.5, y: 0.2 });
   const [visible, setVisible] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [active, setActive] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
     const obs = new IntersectionObserver(
       ([entry]) => entry.isIntersecting && setVisible(true),
-      { threshold: 0.2 }
+      { threshold: 0.15 }
     );
     obs.observe(node);
     return () => obs.disconnect();
   }, []);
 
+  // Scroll-driven progress + active step along the rail
+  useEffect(() => {
+    const onScroll = () => {
+      const rail = railRef.current;
+      if (!rail) return;
+      const r = rail.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const start = vh * 0.75;
+      const end = vh * 0.25;
+      const total = r.height - (start - end);
+      const traveled = Math.min(Math.max(start - r.top, 0), total);
+      const p = total > 0 ? traveled / total : 0;
+      setProgress(p);
+      setActive(Math.min(STEPS.length - 1, Math.floor(p * STEPS.length + 0.01)));
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
     setMouse({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height });
-  };
-
-  const email = "N21West.nl@gmail.com";
-  const copyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(email);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {}
   };
 
   return (
@@ -72,7 +127,7 @@ function WorkWithUs() {
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-70 transition-opacity duration-500"
         style={{
-          background: `radial-gradient(600px circle at ${mouse.x * 100}% ${mouse.y * 100}%, oklch(0.78 0.13 85 / 0.12), transparent 60%)`,
+          background: `radial-gradient(700px circle at ${mouse.x * 100}% ${mouse.y * 100}%, oklch(0.78 0.13 85 / 0.10), transparent 60%)`,
         }}
       />
       {/* Grid texture */}
@@ -89,7 +144,7 @@ function WorkWithUs() {
       />
 
       <div className="relative mx-auto grid max-w-7xl grid-cols-12 gap-x-6 gap-y-16 px-6 lg:px-10">
-        {/* LEFT — Editorial header (asymmetric ~60%) */}
+        {/* Header — asymmetric ~60% */}
         <div className="col-span-12 lg:col-span-7">
           <div
             className={`flex items-center gap-4 transition-all duration-700 ${
@@ -101,7 +156,7 @@ function WorkWithUs() {
               className="text-[11px] uppercase tracking-[0.32em] text-gold"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              §01 — Partnership
+              §02 — Market Entry &amp; Retail Presence
             </span>
           </div>
 
@@ -111,15 +166,16 @@ function WorkWithUs() {
               visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
             }`}
           >
-            Work
+            Our
             <br />
             <span className="inline-flex items-baseline gap-4">
               <span className="italic text-gold-soft" style={{ fontFamily: "var(--font-display)" }}>
-                with
+                Process
               </span>
               <span className="relative">
-                Us
-                <span className="absolute -bottom-2 left-0 h-[3px] w-full origin-left scale-x-0 bg-gold transition-transform delay-700 duration-700"
+                .
+                <span
+                  className="absolute -bottom-2 left-0 h-[3px] w-full origin-left bg-gold transition-transform delay-700 duration-700"
                   style={{ transform: visible ? "scaleX(1)" : "scaleX(0)" }}
                 />
               </span>
@@ -131,30 +187,21 @@ function WorkWithUs() {
               visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
             }`}
           >
-            We partner with brands that are ready to enter the European market with{" "}
-            <em className="not-italic text-gold-soft">intention</em>,{" "}
-            <em className="not-italic text-gold-soft">clarity</em>, and{" "}
-            <em className="not-italic text-gold-soft">long-term commitment</em>.
-          </p>
-          <p
-            className={`mt-4 max-w-xl text-base leading-relaxed text-white/55 transition-all delay-500 duration-1000 ${
-              visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-            }`}
-          >
-            If you are ready to take the next step, we would be glad to connect.
+            A <em className="not-italic text-gold-soft">seven-step</em> journey from discovery to
+            long-term growth, designed to bring your brand into the European market with{" "}
+            <em className="not-italic text-gold-soft">intention</em> and{" "}
+            <em className="not-italic text-gold-soft">clarity</em>.
           </p>
         </div>
 
-        {/* RIGHT — Contact card (asymmetric ~40%) */}
-        <div className="col-span-12 lg:col-span-5 lg:pt-24">
-          <div
-            className={`group relative transition-all delay-500 duration-1000 ${
-              visible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-            }`}
-          >
-            {/* Gold border frame */}
-            <div className="relative border border-white/10 bg-noir/50 p-8 backdrop-blur-sm sm:p-10 transition-colors duration-500 hover:border-gold/40">
-              {/* Corner ticks */}
+        {/* Side index — sticky counter */}
+        <aside className="col-span-12 lg:col-span-5 lg:pt-24">
+          <div className="lg:sticky lg:top-24">
+            <div
+              className={`relative border border-white/10 bg-noir/50 p-8 backdrop-blur-sm transition-all delay-500 duration-1000 ${
+                visible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+              }`}
+            >
               <Corner className="-left-px -top-px" />
               <Corner className="-right-px -top-px rotate-90" />
               <Corner className="-bottom-px -left-px -rotate-90" />
@@ -165,84 +212,143 @@ function WorkWithUs() {
                   className="text-[10px] uppercase tracking-[0.32em] text-white/40"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  Direct line
+                  Stage
                 </span>
                 <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.28em] text-gold">
                   <span className="relative flex h-1.5 w-1.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-gold" />
                   </span>
-                  Available
+                  In motion
                 </span>
               </div>
 
-              <button
-                type="button"
-                onClick={copyEmail}
-                className="group/email mt-6 block w-full text-left"
-              >
+              <div className="mt-6 flex items-end gap-3">
                 <span
                   style={{ fontFamily: "var(--font-display)" }}
-                  className="block break-all text-2xl font-medium leading-tight text-white transition-colors duration-300 group-hover/email:text-gold sm:text-3xl"
+                  className="text-7xl font-medium leading-none tracking-tight text-gold transition-all duration-500"
+                  key={STEPS[active].n}
                 >
-                  {email}
+                  {STEPS[active].n}
                 </span>
-                <span className="mt-3 inline-flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-white/40 transition-colors group-hover/email:text-gold-soft">
-                  {copied ? "Copied to clipboard" : "Click to copy"}
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path
-                      d={copied ? "M2 6l3 3 5-6" : "M3 3h6v6M3 9l6-6"}
-                      stroke="currentColor"
-                      strokeWidth="1.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </button>
-
-              <div className="my-8 h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-
-              <a
-                href={`mailto:${email}?subject=Partnership%20Inquiry`}
-                className="relative inline-flex w-full items-center justify-between overflow-hidden border border-gold/60 bg-transparent px-6 py-4 transition-all duration-500 hover:border-gold"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
                 <span
-                  aria-hidden
-                  className="absolute inset-0 -translate-x-full bg-gold transition-transform duration-500 ease-out group-hover:translate-x-0"
-                />
-                <span className="relative text-sm font-medium uppercase tracking-[0.28em] text-gold transition-colors duration-500 group-hover:text-noir-deep">
-                  Get Started
+                  style={{ fontFamily: "var(--font-display)" }}
+                  className="pb-2 text-2xl font-medium text-white"
+                >
+                  {STEPS[active].title}
                 </span>
-                <span className="relative flex h-8 w-8 items-center justify-center text-gold transition-all duration-500 group-hover:translate-x-1 group-hover:text-noir-deep">
-                  <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
-                    <path
-                      d="M1 5h17m0 0L14 1m4 4l-4 4"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </a>
+              </div>
 
-              <div className="mt-8 grid grid-cols-3 gap-4 text-[10px] uppercase tracking-[0.2em] text-white/35">
-                <Meta label="Based" value="Amsterdam" />
-                <Meta label="Reply" value="< 48h" />
-                <Meta label="Scope" value="Europe" />
+              <p className="mt-4 text-sm leading-relaxed text-white/60">
+                {STEPS[active].body}
+              </p>
+
+              {/* Progress bar */}
+              <div className="mt-8">
+                <div className="relative h-px w-full bg-white/10">
+                  <div
+                    className="absolute left-0 top-0 h-px bg-gold transition-[width] duration-300"
+                    style={{ width: `${progress * 100}%` }}
+                  />
+                </div>
+                <div className="mt-3 flex items-center justify-between text-[10px] uppercase tracking-[0.28em] text-white/40">
+                  <span>{String(active + 1).padStart(2, "0")} / 07</span>
+                  <span>{Math.round(progress * 100)}%</span>
+                </div>
               </div>
             </div>
           </div>
+        </aside>
+
+        {/* Rail of steps */}
+        <div ref={railRef} className="col-span-12 lg:col-span-7 lg:-mt-24">
+          <ol className="relative">
+            {/* Vertical line */}
+            <div
+              aria-hidden
+              className="absolute left-[18px] top-0 h-full w-px bg-white/10 sm:left-[26px]"
+            />
+            <div
+              aria-hidden
+              className="absolute left-[18px] top-0 w-px bg-gold transition-[height] duration-300 sm:left-[26px]"
+              style={{ height: `${progress * 100}%` }}
+            />
+
+            {STEPS.map((s, i) => {
+              const isActive = i === active;
+              const isPast = i < active;
+              return (
+                <li
+                  key={s.n}
+                  className={`group relative flex gap-6 py-8 transition-all duration-700 sm:gap-10 ${
+                    visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
+                  }`}
+                  style={{ transitionDelay: `${200 + i * 80}ms` }}
+                >
+                  {/* Node */}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <span
+                      className={`relative flex h-9 w-9 items-center justify-center rounded-full border bg-noir-deep transition-all duration-500 sm:h-[52px] sm:w-[52px] ${
+                        isActive
+                          ? "border-gold shadow-[0_0_0_6px_oklch(0.78_0.13_85/0.08)]"
+                          : isPast
+                            ? "border-gold/60"
+                            : "border-white/15"
+                      }`}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
+                          isActive || isPast ? "bg-gold" : "bg-white/30"
+                        }`}
+                      />
+                      {isActive && (
+                        <span className="absolute inset-0 -z-0 animate-ping rounded-full border border-gold/40" />
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 border-b border-white/5 pb-2">
+                    <div className="flex items-baseline gap-4">
+                      <span
+                        style={{ fontFamily: "var(--font-display)" }}
+                        className={`text-xs uppercase tracking-[0.32em] transition-colors duration-500 ${
+                          isActive || isPast ? "text-gold" : "text-white/35"
+                        }`}
+                      >
+                        Step {s.n}
+                      </span>
+                      <span className="h-px flex-1 bg-white/5" />
+                    </div>
+                    <h3
+                      style={{ fontFamily: "var(--font-display)" }}
+                      className={`mt-3 text-[clamp(1.75rem,4vw,3rem)] font-medium leading-[1.02] tracking-[-0.02em] transition-colors duration-500 ${
+                        isActive ? "text-white" : isPast ? "text-white/80" : "text-white/45"
+                      }`}
+                    >
+                      {s.title}
+                    </h3>
+                    <p
+                      className={`mt-3 max-w-xl text-base leading-relaxed transition-colors duration-500 sm:text-lg ${
+                        isActive ? "text-white/75" : "text-white/40"
+                      }`}
+                    >
+                      {s.body}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
         </div>
 
-        {/* Bottom marker line */}
-        <div className="col-span-12 mt-8 flex items-center justify-between border-t border-white/10 pt-6 text-[10px] uppercase tracking-[0.28em] text-white/30"
+        {/* Bottom marker */}
+        <div
+          className="col-span-12 mt-8 flex items-center justify-between border-t border-white/10 pt-6 text-[10px] uppercase tracking-[0.28em] text-white/30"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          <span>N21 West — Est. Netherlands</span>
-          <span className="hidden sm:inline">Selective Partnerships · {new Date().getFullYear()}</span>
+          <span>N21 West — Market Entry Framework</span>
+          <span className="hidden sm:inline">Seven Stages · {new Date().getFullYear()}</span>
           <span>↘ Continue</span>
         </div>
       </div>
@@ -256,16 +362,5 @@ function Corner({ className = "" }: { className?: string }) {
       aria-hidden
       className={`absolute h-3 w-3 border-l border-t border-gold ${className}`}
     />
-  );
-}
-
-function Meta({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="text-white/30">{label}</span>
-      <span className="text-white/70" style={{ fontFamily: "var(--font-display)" }}>
-        {value}
-      </span>
-    </div>
   );
 }
