@@ -20,7 +20,7 @@ type Step = {
   title: string;
   body: string;
   meta: string;
-  Icon: (props: SVGProps<SVGSVGElement> & { className?: string }) => React.ReactElement;
+  Icon: (props: { className?: string }) => ReturnType<typeof IconDiscovery>;
 };
 
 const STEPS: Step[] = [
