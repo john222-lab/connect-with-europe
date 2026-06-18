@@ -20,7 +20,7 @@ type Step = {
   title: string;
   body: string;
   meta: string;
-  Icon: (props: { className?: string }) => JSX.Element;
+  Icon: (props: SVGProps<SVGSVGElement> & { className?: string }) => React.ReactElement;
 };
 
 const STEPS: Step[] = [
