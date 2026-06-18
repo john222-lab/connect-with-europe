@@ -20,7 +20,7 @@ type Step = {
   title: string;
   body: string;
   meta: string;
-  Icon: (props: { className?: string }) => ReturnType<typeof IconDiscovery>;
+  Icon: ComponentType<{ className?: string }>;
 };
 
 const STEPS: Step[] = [
