@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type ComponentType } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -15,64 +15,14 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Step = {
-  n: string;
-  title: string;
-  body: string;
-  meta: string;
-  Icon: ComponentType<{ className?: string }>;
-};
-
-const STEPS: Step[] = [
-  {
-    n: "01",
-    title: "Discovery",
-    body: "Understanding your brand, products and aspirations.",
-    meta: "Listen · Learn",
-    Icon: IconDiscovery,
-  },
-  {
-    n: "02",
-    title: "Curation",
-    body: "Assessing suitability for the Dutch market.",
-    meta: "Select · Refine",
-    Icon: IconCuration,
-  },
-  {
-    n: "03",
-    title: "Positioning",
-    body: "Refining pricing, presentation and storytelling.",
-    meta: "Price · Narrate",
-    Icon: IconPositioning,
-  },
-  {
-    n: "04",
-    title: "Retail Presence",
-    body: "Introducing your brand into retail presence.",
-    meta: "Place · Display",
-    Icon: IconRetail,
-  },
-  {
-    n: "05",
-    title: "Activation",
-    body: "Connecting your brand with customers through engagement and exposure.",
-    meta: "Engage · Expose",
-    Icon: IconActivation,
-  },
-  {
-    n: "06",
-    title: "Insights",
-    body: "Gathering feedback, sales performance and market response.",
-    meta: "Measure · Learn",
-    Icon: IconInsights,
-  },
-  {
-    n: "07",
-    title: "Growth",
-    body: "Exploring future opportunities and long-term collaboration.",
-    meta: "Scale · Sustain",
-    Icon: IconGrowth,
-  },
+const STEPS = [
+  { n: "01", title: "Discovery",       body: "Understanding your brand, products and aspirations." },
+  { n: "02", title: "Curation",        body: "Assessing suitability for the Dutch market." },
+  { n: "03", title: "Positioning",     body: "Refining pricing, presentation and storytelling." },
+  { n: "04", title: "Retail Presence", body: "Introducing your brand into retail presence." },
+  { n: "05", title: "Activation",      body: "Connecting your brand with customers through engagement and exposure." },
+  { n: "06", title: "Insights",        body: "Gathering feedback, sales performance and market response." },
+  { n: "07", title: "Growth",          body: "Exploring future opportunities and long-term collaboration." },
 ];
 
 function Index() {
@@ -82,35 +32,43 @@ function Index() {
       style={{ fontFamily: "var(--font-sans)" }}
     >
       <Hero />
-      <JourneyMap />
+      <SerpentineJourney />
       <Closing />
     </main>
   );
 }
 
-/* ─────────────────────────────────  HERO  ───────────────────────────────── */
+/* ─────────────────────────────── HERO ─────────────────────────────── */
 
 function Hero() {
   const [m, setM] = useState({ x: 0.5, y: 0.4 });
+  const headlineRef = useRef<HTMLHeadingElement | null>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setShown(true), 60);
+    return () => window.clearTimeout(id);
+  }, []);
+
   const onMove = (e: React.MouseEvent<HTMLElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
     setM({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height });
   };
 
+  const headline = "Our Process";
+
   return (
     <section
       onMouseMove={onMove}
-      className="relative overflow-hidden border-b border-white/5 px-6 pb-24 pt-28 sm:pt-32 lg:px-10 lg:pb-32 lg:pt-40"
+      className="relative overflow-hidden border-b border-white/5 px-6 pb-28 pt-28 sm:pt-36 lg:px-10 lg:pb-40 lg:pt-44"
     >
-      {/* Spotlight */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
-          background: `radial-gradient(800px circle at ${m.x * 100}% ${m.y * 100}%, oklch(0.78 0.13 85 / 0.12), transparent 60%)`,
+          background: `radial-gradient(900px circle at ${m.x * 100}% ${m.y * 100}%, oklch(0.78 0.13 85 / 0.12), transparent 60%)`,
         }}
       />
-      {/* Grid texture */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-[0.05]"
@@ -118,28 +76,16 @@ function Hero() {
           backgroundImage:
             "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
           backgroundSize: "80px 80px",
-          maskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+          maskImage: "radial-gradient(ellipse at center, black 35%, transparent 80%)",
         }}
       />
-      {/* Giant outlined "07" watermark */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-10 top-1/2 hidden -translate-y-1/2 select-none lg:block"
-        style={{ fontFamily: "var(--font-display)" }}
-      >
-        <span
-          className="text-[28rem] font-medium leading-none tracking-tighter"
-          style={{
-            WebkitTextStroke: "1px oklch(0.78 0.13 85 / 0.18)",
-            color: "transparent",
-          }}
-        >
-          07
-        </span>
-      </div>
 
-      <div className="relative mx-auto grid max-w-7xl grid-cols-12 gap-x-6 gap-y-10">
-        <div className="col-span-12 flex items-center gap-4">
+      <div className="relative mx-auto max-w-7xl text-center">
+        <div
+          className={`inline-flex items-center gap-4 transition-all duration-1000 ${
+            shown ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+          }`}
+        >
           <span className="h-px w-12 bg-gold" />
           <span
             className="text-[11px] uppercase tracking-[0.32em] text-gold"
@@ -147,65 +93,125 @@ function Hero() {
           >
             §02 — Market Entry &amp; Retail Presence
           </span>
+          <span className="h-px w-12 bg-gold" />
         </div>
 
         <h1
+          ref={headlineRef}
+          aria-label={headline}
           style={{ fontFamily: "var(--font-display)" }}
-          className="col-span-12 text-[clamp(3rem,10vw,9rem)] font-medium leading-[0.9] tracking-[-0.045em] lg:col-span-10"
+          className="mx-auto mt-10 max-w-5xl text-[clamp(3.5rem,11vw,10rem)] font-medium leading-[0.9] tracking-[-0.045em]"
         >
-          Our{" "}
-          <span className="italic text-gold-soft">Process</span>
+          {headline.split("").map((ch, i) => (
+            <span
+              key={i}
+              aria-hidden
+              className="inline-block transition-all"
+              style={{
+                transitionDuration: "900ms",
+                transitionDelay: `${120 + i * 55}ms`,
+                opacity: shown ? 1 : 0,
+                transform: shown ? "translateY(0)" : "translateY(40%)",
+                filter: shown ? "blur(0)" : "blur(8px)",
+                fontStyle: ch === "P" || ch === "r" || ch === "o" || ch === "c" || ch === "e" || ch === "s" ? undefined : undefined,
+              }}
+            >
+              {ch === " " ? "\u00A0" : ch}
+            </span>
+          ))}
           <span className="text-gold">.</span>
         </h1>
 
-        <p className="col-span-12 max-w-2xl text-lg leading-relaxed text-white/65 sm:text-xl lg:col-span-7">
+        <p
+          className={`mx-auto mt-10 max-w-2xl text-lg leading-relaxed text-white/65 transition-all duration-1000 sm:text-xl ${
+            shown ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+          }`}
+          style={{ transitionDelay: "900ms" }}
+        >
           A <em className="not-italic text-gold-soft">seven-step</em> journey from discovery to long-term growth, designed to bring your brand into the European market with{" "}
           <em className="not-italic text-gold-soft">intention</em> and{" "}
           <em className="not-italic text-gold-soft">clarity</em>.
         </p>
 
         <div
-          className="col-span-12 mt-4 flex flex-wrap items-center gap-x-10 gap-y-4 text-[11px] uppercase tracking-[0.28em] text-white/40 lg:col-span-7"
-          style={{ fontFamily: "var(--font-display)" }}
+          className={`mx-auto mt-14 flex w-fit flex-col items-center gap-2 text-[10px] uppercase tracking-[0.32em] text-white/40 transition-opacity duration-1000 ${
+            shown ? "opacity-100" : "opacity-0"
+          }`}
+          style={{ fontFamily: "var(--font-display)", transitionDelay: "1300ms" }}
         >
-          <span><span className="text-gold">07</span> Stages</span>
-          <span><span className="text-gold">01</span> Framework</span>
-          <span><span className="text-gold">∞</span> Possibilities</span>
+          <span>Scroll to follow the path</span>
+          <svg width="14" height="40" viewBox="0 0 14 40" fill="none" className="text-gold">
+            <path d="M7 0v32" stroke="currentColor" strokeWidth="1" />
+            <path d="M2 28l5 8 5-8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </div>
       </div>
     </section>
   );
 }
 
-/* ──────────────────────────────  JOURNEY MAP  ───────────────────────────── */
+/* ──────────────────────── SERPENTINE JOURNEY ──────────────────────── */
 
-function JourneyMap() {
-  const [active, setActive] = useState<number | null>(null);
-  const wrapRef = useRef<HTMLDivElement | null>(null);
-  const [visibleIdx, setVisibleIdx] = useState<Set<number>>(new Set());
+function SerpentineJourney() {
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const pathRef = useRef<SVGPathElement | null>(null);
+  const [pathLen, setPathLen] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [active, setActive] = useState(0);
 
+  // Measure path length once mounted (and on resize)
   useEffect(() => {
-    const nodes = wrapRef.current?.querySelectorAll<HTMLElement>("[data-step]");
-    if (!nodes) return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            const i = Number((e.target as HTMLElement).dataset.step);
-            setVisibleIdx((prev) => new Set(prev).add(i));
-          }
-        });
-      },
-      { threshold: 0.25 }
-    );
-    nodes.forEach((n) => obs.observe(n));
-    return () => obs.disconnect();
+    const measure = () => {
+      if (pathRef.current) setPathLen(pathRef.current.getTotalLength());
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
   }, []);
 
+  // Scroll-driven progress through the section
+  useEffect(() => {
+    const onScroll = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const start = vh * 0.85;
+      const end = vh * 0.2;
+      const total = r.height - (start - end);
+      const traveled = Math.min(Math.max(start - r.top, 0), total);
+      const p = total > 0 ? traveled / total : 0;
+      setProgress(p);
+      setActive(Math.min(STEPS.length - 1, Math.floor(p * STEPS.length + 0.001)));
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  // Serpentine SVG path — built across a fixed viewBox; scales to container width
+  // Viewport: 1000 wide, 2100 tall — 7 curved segments
+  const PATH_D = `
+    M 500 40
+    C 760 120, 760 300, 500 380
+    C 240 460, 240 640, 500 720
+    C 760 800, 760 980, 500 1060
+    C 240 1140, 240 1320, 500 1400
+    C 760 1480, 760 1660, 500 1740
+    C 240 1820, 240 2000, 500 2080
+  `;
+
   return (
-    <section className="relative px-6 py-24 sm:py-28 lg:px-10 lg:py-32">
-      {/* Section label */}
-      <div className="mx-auto mb-16 flex max-w-7xl items-center justify-between">
+    <section
+      ref={sectionRef}
+      className="relative px-6 py-24 sm:py-28 lg:px-10 lg:py-32"
+    >
+      {/* Eyebrow */}
+      <div className="mx-auto mb-20 flex max-w-6xl items-center justify-between">
         <div className="flex items-center gap-4">
           <span className="h-px w-8 bg-gold/60" />
           <span
@@ -216,203 +222,205 @@ function JourneyMap() {
           </span>
         </div>
         <span
-          className="hidden text-[10px] uppercase tracking-[0.32em] text-white/30 sm:inline"
+          className="hidden text-[10px] uppercase tracking-[0.32em] text-gold sm:inline"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          Hover · Explore
+          {String(active + 1).padStart(2, "0")} / 07 · {Math.round(progress * 100)}%
         </span>
       </div>
 
-      <div ref={wrapRef} className="mx-auto max-w-7xl">
-        {/* Bento grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12 lg:gap-5">
+      <div className="relative mx-auto max-w-6xl">
+        {/* SVG serpentine path — absolute, full height */}
+        <svg
+          aria-hidden
+          viewBox="0 0 1000 2120"
+          preserveAspectRatio="none"
+          className="pointer-events-none absolute inset-0 hidden h-full w-full md:block"
+        >
+          {/* Faint base path */}
+          <path
+            d={PATH_D}
+            fill="none"
+            stroke="oklch(1 0 0 / 0.08)"
+            strokeWidth="1.2"
+          />
+          {/* Gold draw path */}
+          <path
+            ref={pathRef}
+            d={PATH_D}
+            fill="none"
+            stroke="oklch(0.78 0.13 85)"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            style={{
+              strokeDasharray: pathLen || 0,
+              strokeDashoffset: pathLen ? pathLen * (1 - progress) : 0,
+              transition: "stroke-dashoffset 200ms linear",
+              filter: "drop-shadow(0 0 6px oklch(0.78 0.13 85 / 0.5))",
+            }}
+          />
+        </svg>
+
+        {/* Steps — alternating sides */}
+        <ol className="relative grid grid-cols-1 gap-y-20 md:gap-y-28">
           {STEPS.map((s, i) => {
-            // Asymmetric bento layout — distinct sizes per tile
-            const spans = [
-              "lg:col-span-7 lg:row-span-2", // 01 large
-              "lg:col-span-5",                // 02
-              "lg:col-span-5",                // 03
-              "lg:col-span-6 lg:row-span-2", // 04 large
-              "lg:col-span-6",                // 05
-              "lg:col-span-6",                // 06
-              "lg:col-span-12",               // 07 wide finale
-            ];
-            const isLarge = i === 0 || i === 3 || i === 6;
+            const left = i % 2 === 0;
+            const isActive = i === active;
+            const isPast = i < active;
             return (
-              <StepTile
+              <StepRow
                 key={s.n}
                 index={i}
                 step={s}
-                className={spans[i]}
-                large={isLarge}
-                isHot={active === i}
-                onEnter={() => setActive(i)}
-                onLeave={() => setActive((v) => (v === i ? null : v))}
-                revealed={visibleIdx.has(i)}
+                left={left}
+                isActive={isActive}
+                isPast={isPast}
               />
             );
           })}
-        </div>
-
-        {/* Connector strip */}
-        <div className="mt-16 flex items-center gap-4">
-          <span className="h-px flex-1 bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
-          <span
-            className="text-[10px] uppercase tracking-[0.32em] text-gold"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            End of framework
-          </span>
-          <span className="h-px flex-1 bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
-        </div>
+        </ol>
       </div>
     </section>
   );
 }
 
-function StepTile({
+function StepRow({
   step,
   index,
-  className = "",
-  large,
-  isHot,
-  onEnter,
-  onLeave,
-  revealed,
+  left,
+  isActive,
+  isPast,
 }: {
-  step: Step;
+  step: { n: string; title: string; body: string };
   index: number;
-  className?: string;
-  large?: boolean;
-  isHot: boolean;
-  onEnter: () => void;
-  onLeave: () => void;
-  revealed: boolean;
+  left: boolean;
+  isActive: boolean;
+  isPast: boolean;
 }) {
-  const [m, setM] = useState({ x: 0.5, y: 0.5 });
-  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    setM({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height });
-  };
-  const Icon = step.Icon;
+  const ref = useRef<HTMLLIElement | null>(null);
+  const [seen, setSeen] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => e.isIntersecting && setSeen(true),
+      { threshold: 0.3 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const dim = !isActive && !isPast;
 
   return (
-    <article
-      data-step={index}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-      onMouseMove={onMove}
-      className={`group relative isolate overflow-hidden border border-white/10 bg-noir/40 backdrop-blur-sm transition-all duration-700 ease-out ${className} ${
-        revealed ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+    <li
+      ref={ref}
+      className={`relative grid grid-cols-12 items-center transition-all duration-700 ${
+        seen ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
       }`}
-      style={{
-        transitionDelay: `${index * 70}ms`,
-        minHeight: large ? 360 : 240,
-      }}
+      style={{ transitionDelay: `${index * 60}ms` }}
     >
-      {/* Hover spotlight */}
+      {/* Left side content (or spacer) */}
       <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        style={{
-          background: `radial-gradient(400px circle at ${m.x * 100}% ${m.y * 100}%, oklch(0.78 0.13 85 / 0.16), transparent 65%)`,
-        }}
-      />
-      {/* Gold sweep on hover */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-gradient-to-r from-transparent via-gold to-transparent transition-transform duration-700 group-hover:scale-x-100"
-      />
-      {/* Corner ticks */}
-      <Corner className="-left-px -top-px" />
-      <Corner className="-right-px -top-px rotate-90" />
-      <Corner className="-bottom-px -left-px -rotate-90" />
-      <Corner className="-bottom-px -right-px rotate-180" />
-
-      {/* Background numeral */}
-      <span
-        aria-hidden
-        className={`pointer-events-none absolute right-4 select-none font-medium leading-none tracking-tighter transition-all duration-700 ${
-          large ? "bottom-4 text-[16rem]" : "bottom-2 text-[10rem]"
+        className={`col-span-12 md:col-span-5 ${left ? "md:order-1" : "md:order-3"} ${
+          left ? "md:pr-12 md:text-right" : "md:pl-12 md:text-left"
         }`}
-        style={{
-          fontFamily: "var(--font-display)",
-          WebkitTextStroke: "1px oklch(0.78 0.13 85 / 0.14)",
-          color: "transparent",
-          transform: isHot ? "translateY(-6px)" : "translateY(0)",
-        }}
       >
-        {step.n}
-      </span>
-
-      <div className="relative flex h-full flex-col justify-between p-6 sm:p-8">
-        {/* Top row */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
+        <div
+          className={`transition-all duration-700 ${
+            dim ? "scale-[0.97] opacity-50 blur-[1px]" : "scale-100 opacity-100 blur-0"
+          }`}
+        >
+          <div
+            className={`flex items-center gap-3 ${left ? "md:justify-end" : "justify-start"}`}
+          >
+            {!left && <span className="h-px w-8 bg-gold/60" />}
             <span
               className="text-[10px] uppercase tracking-[0.32em] text-gold"
               style={{ fontFamily: "var(--font-display)" }}
             >
               Step {step.n}
             </span>
-            <span className="h-px w-8 bg-gold/40" />
+            {left && <span className="h-px w-8 bg-gold/60" />}
           </div>
-          <div
-            className={`relative grid h-12 w-12 place-items-center rounded-full border transition-all duration-500 ${
-              isHot ? "border-gold bg-gold/10" : "border-white/15 bg-white/[0.02]"
-            }`}
-          >
-            <Icon className={`h-5 w-5 transition-colors duration-500 ${isHot ? "text-gold" : "text-white/60"}`} />
-            {isHot && (
-              <span className="absolute inset-0 -z-0 animate-ping rounded-full border border-gold/40" />
-            )}
-          </div>
-        </div>
 
-        {/* Bottom block */}
-        <div className="mt-auto pt-10">
           <h3
             style={{ fontFamily: "var(--font-display)" }}
-            className={`font-medium leading-[1.02] tracking-[-0.025em] transition-colors duration-500 ${
-              large ? "text-[clamp(2.5rem,5vw,4.5rem)]" : "text-[clamp(1.75rem,3vw,2.75rem)]"
-            } ${isHot ? "text-white" : "text-white/85"}`}
+            className={`mt-4 text-[clamp(2.25rem,5vw,4rem)] font-medium leading-[0.98] tracking-[-0.03em] transition-colors duration-500 ${
+              isActive ? "text-white" : isPast ? "text-white/85" : "text-white/70"
+            }`}
           >
             {step.title}
           </h3>
+
           <p
-            className={`mt-3 max-w-md text-sm leading-relaxed text-white/55 sm:text-base ${
-              large ? "max-w-lg" : ""
+            className={`mt-4 max-w-md text-base leading-relaxed text-white/55 sm:text-lg ${
+              left ? "md:ml-auto" : ""
             }`}
           >
             {step.body}
           </p>
-          <div className="mt-6 flex items-center justify-between">
-            <span
-              className="text-[10px] uppercase tracking-[0.32em] text-white/35"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              {step.meta}
-            </span>
-            <span
-              aria-hidden
-              className={`flex items-center gap-2 text-[10px] uppercase tracking-[0.32em] transition-all duration-500 ${
-                isHot ? "text-gold" : "text-white/25"
-              }`}
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              <span
-                className={`h-px transition-all duration-500 ${isHot ? "w-10 bg-gold" : "w-5 bg-white/25"}`}
-              />
-              {index < STEPS.length - 1 ? "Next" : "Begin"}
-            </span>
-          </div>
         </div>
       </div>
-    </article>
+
+      {/* Center node */}
+      <div className="col-span-12 hidden md:order-2 md:col-span-2 md:flex md:justify-center">
+        <div className="relative">
+          <span
+            className={`relative grid h-14 w-14 place-items-center rounded-full border bg-noir-deep transition-all duration-500 ${
+              isActive
+                ? "border-gold shadow-[0_0_0_8px_oklch(0.78_0.13_85/0.08)]"
+                : isPast
+                  ? "border-gold/70"
+                  : "border-white/15"
+            }`}
+          >
+            <span
+              style={{ fontFamily: "var(--font-display)" }}
+              className={`text-xs font-medium tracking-tight transition-colors duration-500 ${
+                isActive || isPast ? "text-gold" : "text-white/50"
+              }`}
+            >
+              {step.n}
+            </span>
+            {isActive && (
+              <span className="absolute inset-0 -z-0 animate-ping rounded-full border border-gold/40" />
+            )}
+          </span>
+          {isActive && (
+            <span className="absolute left-1/2 top-1/2 -z-10 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/10 blur-2xl" />
+          )}
+        </div>
+      </div>
+
+      {/* Opposite-side oversized numeral watermark */}
+      <div
+        className={`col-span-12 hidden md:col-span-5 md:flex ${
+          left ? "md:order-3 md:justify-start md:pl-12" : "md:order-1 md:justify-end md:pr-12"
+        }`}
+      >
+        <span
+          aria-hidden
+          style={{
+            fontFamily: "var(--font-display)",
+            WebkitTextStroke: isActive
+              ? "1.5px oklch(0.78 0.13 85 / 0.55)"
+              : "1px oklch(0.78 0.13 85 / 0.18)",
+            color: "transparent",
+            transition: "all 600ms ease",
+            transform: isActive ? "translateY(-6px)" : "translateY(0)",
+          }}
+          className="select-none text-[10rem] font-medium leading-none tracking-tighter sm:text-[14rem]"
+        >
+          {step.n}
+        </span>
+      </div>
+    </li>
   );
 }
 
-/* ────────────────────────────────  CLOSING  ─────────────────────────────── */
+/* ─────────────────────────────── CLOSING ─────────────────────────────── */
 
 function Closing() {
   return (
@@ -427,32 +435,30 @@ function Closing() {
           maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
         }}
       />
-      <div className="relative mx-auto grid max-w-7xl grid-cols-12 items-end gap-y-10">
-        <div className="col-span-12 lg:col-span-7">
-          <div className="flex items-center gap-4">
-            <span className="h-px w-12 bg-gold" />
-            <span
-              className="text-[11px] uppercase tracking-[0.32em] text-gold"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              Continue the journey
-            </span>
-          </div>
-          <h2
+      <div className="relative mx-auto max-w-4xl text-center">
+        <div className="flex items-center justify-center gap-4">
+          <span className="h-px w-12 bg-gold" />
+          <span
+            className="text-[11px] uppercase tracking-[0.32em] text-gold"
             style={{ fontFamily: "var(--font-display)" }}
-            className="mt-6 text-[clamp(2.25rem,5vw,4rem)] font-medium leading-[0.98] tracking-[-0.035em]"
           >
-            Seven stages.{" "}
-            <span className="italic text-gold-soft">One direction.</span>
-          </h2>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-white/60 sm:text-lg">
-            Every brand we partner with begins here — with discovery, with curiosity, with a quiet ambition to be understood before being sold.
-          </p>
+            Continue the journey
+          </span>
+          <span className="h-px w-12 bg-gold" />
         </div>
-        <div className="col-span-12 flex flex-wrap items-center gap-4 lg:col-span-5 lg:justify-end">
+        <h2
+          style={{ fontFamily: "var(--font-display)" }}
+          className="mx-auto mt-8 max-w-3xl text-[clamp(2.5rem,6vw,5rem)] font-medium leading-[0.98] tracking-[-0.035em]"
+        >
+          Seven stages. <span className="italic text-gold-soft">One direction.</span>
+        </h2>
+        <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-white/60 sm:text-lg">
+          Every brand we partner with begins here — with discovery, with curiosity, with a quiet ambition to be understood before being sold.
+        </p>
+        <div className="mt-12 flex flex-col items-center gap-6">
           <a
             href="mailto:N21West.nl@gmail.com"
-            className="group relative inline-flex items-center gap-3 overflow-hidden border border-gold bg-transparent px-7 py-4 text-[11px] uppercase tracking-[0.32em] text-gold transition-colors duration-500 hover:text-noir-deep"
+            className="group relative inline-flex items-center gap-3 overflow-hidden border border-gold bg-transparent px-8 py-4 text-[11px] uppercase tracking-[0.32em] text-gold transition-colors duration-500 hover:text-noir-deep"
             style={{ fontFamily: "var(--font-display)" }}
           >
             <span className="absolute inset-0 -z-0 origin-left scale-x-0 bg-gold transition-transform duration-500 ease-out group-hover:scale-x-100" />
@@ -463,87 +469,10 @@ function Closing() {
             className="text-[10px] uppercase tracking-[0.32em] text-white/30"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Amsterdam · {new Date().getFullYear()}
+            N21West.nl@gmail.com · Amsterdam · {new Date().getFullYear()}
           </span>
         </div>
       </div>
     </section>
-  );
-}
-
-/* ─────────────────────────────────  ATOMS  ──────────────────────────────── */
-
-function Corner({ className = "" }: { className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={`pointer-events-none absolute h-3 w-3 border-l border-t border-gold/70 ${className}`}
-    />
-  );
-}
-
-/* ─────────────────────────────────  ICONS  ──────────────────────────────── */
-/* Custom hand-drawn SVGs — one per step, kept on a 24x24 grid */
-
-function IconDiscovery({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className={className}>
-      <circle cx="10.5" cy="10.5" r="6.5" />
-      <path d="m15 15 5 5" strokeLinecap="round" />
-      <circle cx="10.5" cy="10.5" r="2.5" />
-    </svg>
-  );
-}
-function IconCuration({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className={className}>
-      <rect x="3" y="3" width="7" height="7" />
-      <rect x="14" y="3" width="7" height="7" />
-      <rect x="3" y="14" width="7" height="7" />
-      <path d="M14 17.5h7M17.5 14v7" strokeLinecap="round" />
-    </svg>
-  );
-}
-function IconPositioning({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className={className}>
-      <path d="M3 20 12 4l9 16" />
-      <path d="M7 20h10" strokeLinecap="round" />
-      <circle cx="12" cy="14" r="1.4" />
-    </svg>
-  );
-}
-function IconRetail({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className={className}>
-      <path d="M3 9h18l-1.5 11H4.5L3 9Z" />
-      <path d="M3 9 5 4h14l2 5" />
-      <path d="M9 13a3 3 0 0 0 6 0" strokeLinecap="round" />
-    </svg>
-  );
-}
-function IconActivation({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className={className}>
-      <circle cx="12" cy="12" r="2.5" />
-      <circle cx="12" cy="12" r="6" opacity=".6" />
-      <circle cx="12" cy="12" r="9.5" opacity=".3" />
-    </svg>
-  );
-}
-function IconInsights({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className={className}>
-      <path d="M3 20V4M3 20h18" strokeLinecap="round" />
-      <path d="M7 16V11M11 16V7M15 16v-3M19 16V9" strokeLinecap="round" />
-    </svg>
-  );
-}
-function IconGrowth({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className={className}>
-      <path d="M4 18 10 12l4 4 6-8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M14 6h6v6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }
